@@ -13,10 +13,10 @@ interface Progress {
 
 interface Config {
     type: "image" | "video" | "file";
-    onSuccess: Function;
-    onFail: Function;
+    onSuccess?: Function;
+    onFail?: Function;
     onGetConfig: (setConfig: Uploader["setConfig"], data: { [key: string]: any }) => void;
-    onProgress: (progress: Progress) => void;
+    onProgress?: (progress: Progress) => void;
 }
 
 declare class Uploader {

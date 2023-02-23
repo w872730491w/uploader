@@ -1,4 +1,4 @@
-// Uploader v1.0.0 Copyright (c) 2023 wwy and contributors
+// lanyunit-uploader v1.0.0 Copyright (c) 2023 wwy and contributors
 'use strict';
 
 const axios = require('axios');
@@ -31,7 +31,7 @@ const qiniu__namespace = /*#__PURE__*/_interopNamespace(qiniu);
 const COS__default = /*#__PURE__*/_interopDefaultLegacy(COS);
 
 class uploader {
-    constructor({ type, onSuccess, onFail, onGetConfig, onProgress }) {
+    constructor({ type, onSuccess = () => {}, onFail = () => {}, onGetConfig, onProgress = () => {} }) {
         this.type = type;
         this.onSuccess = onSuccess;
         this.onFail = onFail;
@@ -112,18 +112,22 @@ class uploader {
         this.uploader = axios__default["default"].create({
             method: "POST",
             headers: {
+                Accept: "application/json",
                 "Content-type": "multipart/form-data",
             },
             data,
             onUploadProgress: (res) => {
-                this.onProgress(res);
+                this.onProgress({
+                    loaded: res.loaded,
+                    total: res.total,
+                    percent: res.progress * 100,
+                });
             },
         });
     }
 
     setQiniu(config) {
-        console.log(config);
-        this.uploader = qiniu__namespace.upload(this.file, config.prefix + "1", config.token);
+        this.uploader = {};
     }
 
     setLocal(config) {
@@ -139,7 +143,11 @@ class uploader {
             },
             data,
             onUploadProgress: (res) => {
-                this.onProgress(res);
+                this.onProgress({
+                    loaded: res.loaded,
+                    total: res.total,
+                    percent: res.progress * 100,
+                });
             },
         });
     }
@@ -188,6 +196,7 @@ class uploader {
     }
 
     async send(file) {
+        console.log(file);
         this.file = file;
 
         if ((this.config && this.config.expire_time && Math.round(new Date().getTime() / 1000 - 28800) > this.config.expire_time) || !this.config) {
@@ -200,20 +209,20 @@ class uploader {
 
         const config = this.config;
 
-        // if (!this.checkMimeType(file.type, config.mime_types)) {
-        //     return this.onFail(new Error("File type is not allowed"));
-        // }
+        if (!this.checkMimeType(file.type, config.mime_types)) {
+            return this.onFail(new Error("文件类型不符"));
+        }
 
-        // if (file.size > config.max_size) {
-        //     return this.onFail(new Error("The file is too large"));
-        // }
+        if (file.size > config.max_size) {
+            return this.onFail(new Error("文件超出最大上传大小限制"));
+        }
 
         switch (this.driver) {
             case "aliyun":
                 var data = this.uploader.defaults.data;
-                var key = await this.getKey(this.file);
+                var key = await this.getKey(file);
                 data.append("key", config.dir + key);
-                data.append("file", this.file);
+                data.append("file", file);
                 this.uploader
                     .request({
                         url: config.host,
@@ -223,20 +232,51 @@ class uploader {
                         this.onSuccess(res.data);
                     })
                     .catch(async (err) => {
-                        // await import('fast-xml-parser');
-                        // console.log(XMLParser);
-                        // parseString()
-                        console.log(err);
-                        this.onFail(err);
+                        if (err instanceof axios.AxiosError) {
+                            if (err.response.data.includes("Invalid according to Policy: Policy expired.")) {
+                                this.config = null;
+                                return this.send(file);
+                            }
+                            if (err.response.data.includes("<Code>FileAlreadyExists</Code>")) {
+                                return this.onSuccess({
+                                    url: config.host + config.dir + key,
+                                });
+                            }
+                            if (err.response.data.includes(`Invalid according to Policy: Policy Condition failed: ["in", "$content-type"`)) {
+                                return this.onFail(new Error("文件类型不符"));
+                            }
+                            if (err.response.data.includes(`<Code>EntityTooLarge</Code>`)) {
+                                return this.onFail(new Error("文件超出最大上传大小限制"));
+                            }
+                        }
+                        this.onFail(new Error("上传错误"));
                     });
                 break;
             case "qiniu":
+                this.uploader = qiniu__namespace.upload(file, null, config.token);
                 this.uploader.subscribe({
-                    next: (res) => {
-                        this.onProgress(res);
+                    next: ({ total }) => {
+                        this.onProgress({
+                            loaded: total.loaded,
+                            total: total.size,
+                            percent: total.percent,
+                        });
                     },
                     error: (err) => {
-                        this.onFail(err);
+                        if (err instanceof qiniu__namespace.QiniuRequestError) {
+                            if (err.code === 403) {
+                                if (err.data.err.includes("limited mimeType")) {
+                                    return this.onFail(new Error("文件类型不符"));
+                                }
+                                if (err.data.err.includes("key doesn't match with scope")) {
+                                    return this.onFail(new Error("上传错误"));
+                                }
+                            }
+                            if (err.code === 413) {
+                                return this.onFail(new Error("文件超出最大上传大小限制"));
+                            }
+                        }
+                        this.onFail(new Error("上传错误"));
                     },
                     complete: (res) => {
                         this.onSuccess(res);
@@ -244,7 +284,7 @@ class uploader {
                 });
                 break;
             case "tencent":
-                var key = await this.getKey(this.file);
+                var key = await this.getKey(file);
                 this.uploader.putObject(
                     {
                         Bucket: config.bucket /* 存储桶: */,
@@ -253,29 +293,39 @@ class uploader {
                         StorageClass: "STANDARD", // 固定值
                         Body: file, // 上传文件对象
                         onProgress: (progressData) => {
-                            this.onProgress(progressData);
+                            this.onProgress({
+                                loaded: progressData.loaded,
+                                total: progressData.total,
+                                percent: progressData.percent * 100,
+                            });
                         },
                     },
                     async (err, data) => {
                         if (data) {
                             if (data.statusCode === 200) {
                                 try {
-                                    const res = await axios__default["default"].post(config.callback_url, {
-                                        etag: data.ETag,
-                                        sessionToken: config.tempKeys.credentials.sessionToken,
-                                        auth: config.auth,
-                                        localtion: data.Location,
-                                        mimetype: file.type,
-                                        size: file.size,
-                                    });
+                                    const res = await axios__default["default"]
+                                        .post(config.callback_url, {
+                                            etag: data.ETag,
+                                            sessionToken: config.tempKeys.credentials.sessionToken,
+                                            auth: config.auth,
+                                            localtion: data.Location,
+                                            mimetype: file.type,
+                                            size: file.size,
+                                        })
+                                        .catch((err) => {
+                                            if (err instanceof axios.AxiosError) {
+                                                return this.onFail(new Error(err.response.data?.msg));
+                                            }
+                                        });
                                     return this.onSuccess(res.data);
                                 } catch (error) {
-                                    return this.onFail(error);
+                                    this.onFail(err);
                                 }
                             }
-                            this.onFail(data);
+                            this.onFail(new Error("上传失败"));
                         } else {
-                            this.onFail(err);
+                            this.onFail(new Error("上传失败"));
                         }
                     }
                 );
@@ -291,6 +341,9 @@ class uploader {
                         this.onSuccess(res.data);
                     })
                     .catch((err) => {
+                        if (err instanceof axios.AxiosError) {
+                            return this.onFail(new Error(err.response.data?.msg));
+                        }
                         this.onFail(err);
                     });
                 break;

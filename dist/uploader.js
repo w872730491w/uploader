@@ -1,4 +1,4 @@
-// Uploader v1.0.0 Copyright (c) 2023 wwy and contributors
+// lanyunit-uploader v1.0.0 Copyright (c) 2023 wwy and contributors
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('querystring'), require('crypto')) :
   typeof define === 'function' && define.amd ? define(['querystring', 'crypto'], factory) :
@@ -1160,7 +1160,7 @@
    *
    * @returns {Error} The created error.
    */
-  function AxiosError(message, code, config, request, response) {
+  function AxiosError$1(message, code, config, request, response) {
     Error.call(this);
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
@@ -1174,7 +1174,7 @@
     request && (this.request = request);
     response && (this.response = response);
   }
-  utils.inherits(AxiosError, Error, {
+  utils.inherits(AxiosError$1, Error, {
     toJSON: function toJSON() {
       return {
         // Standard
@@ -1195,7 +1195,7 @@
       };
     }
   });
-  var prototype$1 = AxiosError.prototype;
+  var prototype$1 = AxiosError$1.prototype;
   var descriptors = {};
   ['ERR_BAD_OPTION_VALUE', 'ERR_BAD_OPTION', 'ECONNABORTED', 'ETIMEDOUT', 'ERR_NETWORK', 'ERR_FR_TOO_MANY_REDIRECTS', 'ERR_DEPRECATED', 'ERR_BAD_RESPONSE', 'ERR_BAD_REQUEST', 'ERR_CANCELED', 'ERR_NOT_SUPPORT', 'ERR_INVALID_URL'
   // eslint-disable-next-line func-names
@@ -1204,20 +1204,20 @@
       value: code
     };
   });
-  Object.defineProperties(AxiosError, descriptors);
+  Object.defineProperties(AxiosError$1, descriptors);
   Object.defineProperty(prototype$1, 'isAxiosError', {
     value: true
   });
 
   // eslint-disable-next-line func-names
-  AxiosError.from = function (error, code, config, request, response, customProps) {
+  AxiosError$1.from = function (error, code, config, request, response, customProps) {
     var axiosError = Object.create(prototype$1);
     utils.toFlatObject(error, axiosError, function filter(obj) {
       return obj !== Error.prototype;
     }, function (prop) {
       return prop !== 'isAxiosError';
     });
-    AxiosError.call(axiosError, error.message, code, config, request, response);
+    AxiosError$1.call(axiosError, error.message, code, config, request, response);
     axiosError.cause = error;
     axiosError.name = error.name;
     customProps && Object.assign(axiosError, customProps);
@@ -1337,7 +1337,7 @@
         return value.toISOString();
       }
       if (!useBlob && utils.isBlob(value)) {
-        throw new AxiosError('Blob is not supported. Use a Buffer instead.');
+        throw new AxiosError$1('Blob is not supported. Use a Buffer instead.');
       }
       if (utils.isArrayBuffer(value) || utils.isTypedArray(value)) {
         return useBlob && typeof Blob === 'function' ? new Blob([value]) : Buffer.from(value);
@@ -1811,7 +1811,7 @@
         } catch (e) {
           if (strictJSONParsing) {
             if (e.name === 'SyntaxError') {
-              throw AxiosError.from(e, AxiosError.ERR_BAD_RESPONSE, this, null, this.response);
+              throw AxiosError$1.from(e, AxiosError$1.ERR_BAD_RESPONSE, this, null, this.response);
             }
             throw e;
           }
@@ -2186,10 +2186,10 @@
    */
   function CanceledError(message, config, request) {
     // eslint-disable-next-line no-eq-null,eqeqeq
-    AxiosError.call(this, message == null ? 'canceled' : message, AxiosError.ERR_CANCELED, config, request);
+    AxiosError$1.call(this, message == null ? 'canceled' : message, AxiosError$1.ERR_CANCELED, config, request);
     this.name = 'CanceledError';
   }
-  utils.inherits(CanceledError, AxiosError, {
+  utils.inherits(CanceledError, AxiosError$1, {
     __CANCEL__: true
   });
 
@@ -2207,7 +2207,7 @@
     if (!response.status || !validateStatus || validateStatus(response.status)) {
       resolve(response);
     } else {
-      reject(new AxiosError('Request failed with status code ' + response.status, [AxiosError.ERR_BAD_REQUEST, AxiosError.ERR_BAD_RESPONSE][Math.floor(response.status / 100) - 4], response.config, response.request, response));
+      reject(new AxiosError$1('Request failed with status code ' + response.status, [AxiosError$1.ERR_BAD_REQUEST, AxiosError$1.ERR_BAD_RESPONSE][Math.floor(response.status / 100) - 4], response.config, response.request, response));
     }
   }
 
@@ -2504,7 +2504,7 @@
         if (!request) {
           return;
         }
-        reject(new AxiosError('Request aborted', AxiosError.ECONNABORTED, config, request));
+        reject(new AxiosError$1('Request aborted', AxiosError$1.ECONNABORTED, config, request));
 
         // Clean up request
         request = null;
@@ -2514,7 +2514,7 @@
       request.onerror = function handleError() {
         // Real errors are hidden from us by the browser
         // onerror should only fire if it's a network error
-        reject(new AxiosError('Network Error', AxiosError.ERR_NETWORK, config, request));
+        reject(new AxiosError$1('Network Error', AxiosError$1.ERR_NETWORK, config, request));
 
         // Clean up request
         request = null;
@@ -2527,7 +2527,7 @@
         if (config.timeoutErrorMessage) {
           timeoutErrorMessage = config.timeoutErrorMessage;
         }
-        reject(new AxiosError(timeoutErrorMessage, transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED, config, request));
+        reject(new AxiosError$1(timeoutErrorMessage, transitional.clarifyTimeoutError ? AxiosError$1.ETIMEDOUT : AxiosError$1.ECONNABORTED, config, request));
 
         // Clean up request
         request = null;
@@ -2591,7 +2591,7 @@
       }
       var protocol = parseProtocol(fullPath);
       if (protocol && platform.protocols.indexOf(protocol) === -1) {
-        reject(new AxiosError('Unsupported protocol ' + protocol + ':', AxiosError.ERR_BAD_REQUEST, config));
+        reject(new AxiosError$1('Unsupported protocol ' + protocol + ':', AxiosError$1.ERR_BAD_REQUEST, config));
         return;
       }
 
@@ -2633,7 +2633,7 @@
       }
       if (!adapter) {
         if (adapter === false) {
-          throw new AxiosError("Adapter ".concat(nameOrAdapter, " is not supported by the environment"), 'ERR_NOT_SUPPORT');
+          throw new AxiosError$1("Adapter ".concat(nameOrAdapter, " is not supported by the environment"), 'ERR_NOT_SUPPORT');
         }
         throw new Error(utils.hasOwnProp(knownAdapters, nameOrAdapter) ? "Adapter '".concat(nameOrAdapter, "' is not available in the build") : "Unknown adapter '".concat(nameOrAdapter, "'"));
       }
@@ -2831,7 +2831,7 @@
     // eslint-disable-next-line func-names
     return function (value, opt, opts) {
       if (validator === false) {
-        throw new AxiosError(formatMessage(opt, ' has been removed' + (version ? ' in ' + version : '')), AxiosError.ERR_DEPRECATED);
+        throw new AxiosError$1(formatMessage(opt, ' has been removed' + (version ? ' in ' + version : '')), AxiosError$1.ERR_DEPRECATED);
       }
       if (version && !deprecatedWarnings[opt]) {
         deprecatedWarnings[opt] = true;
@@ -2854,7 +2854,7 @@
 
   function assertOptions(options, schema, allowUnknown) {
     if (_typeof(options) !== 'object') {
-      throw new AxiosError('options must be an object', AxiosError.ERR_BAD_OPTION_VALUE);
+      throw new AxiosError$1('options must be an object', AxiosError$1.ERR_BAD_OPTION_VALUE);
     }
     var keys = Object.keys(options);
     var i = keys.length;
@@ -2865,12 +2865,12 @@
         var value = options[opt];
         var result = value === undefined || validator(value, opt, options);
         if (result !== true) {
-          throw new AxiosError('option ' + opt + ' must be ' + result, AxiosError.ERR_BAD_OPTION_VALUE);
+          throw new AxiosError$1('option ' + opt + ' must be ' + result, AxiosError$1.ERR_BAD_OPTION_VALUE);
         }
         continue;
       }
       if (allowUnknown !== true) {
-        throw new AxiosError('Unknown option ' + opt, AxiosError.ERR_BAD_OPTION);
+        throw new AxiosError$1('Unknown option ' + opt, AxiosError$1.ERR_BAD_OPTION);
       }
     }
   }
@@ -3309,7 +3309,7 @@
   axios.toFormData = toFormData;
 
   // Expose AxiosError class
-  axios.AxiosError = AxiosError;
+  axios.AxiosError = AxiosError$1;
 
   // alias for CanceledError for backward compatibility
   axios.Cancel = axios.CanceledError;
@@ -3339,7 +3339,7 @@
   // Keep top-level export same with static properties
   // so that it can keep same with es module or cjs
   axios$1.Axios;
-    axios$1.AxiosError;
+    var AxiosError = axios$1.AxiosError;
     axios$1.CanceledError;
     axios$1.isCancel;
     axios$1.CancelToken;
@@ -21276,10 +21276,13 @@
   var uploader = /*#__PURE__*/function () {
     function uploader(_ref) {
       var type = _ref.type,
-        onSuccess = _ref.onSuccess,
-        onFail = _ref.onFail,
+        _ref$onSuccess = _ref.onSuccess,
+        onSuccess = _ref$onSuccess === void 0 ? function () {} : _ref$onSuccess,
+        _ref$onFail = _ref.onFail,
+        onFail = _ref$onFail === void 0 ? function () {} : _ref$onFail,
         onGetConfig = _ref.onGetConfig,
-        onProgress = _ref.onProgress;
+        _ref$onProgress = _ref.onProgress,
+        onProgress = _ref$onProgress === void 0 ? function () {} : _ref$onProgress;
       _classCallCheck(this, uploader);
       this.type = type;
       this.onSuccess = onSuccess;
@@ -21367,19 +21370,23 @@
         this.uploader = axios$1.create({
           method: "POST",
           headers: {
+            Accept: "application/json",
             "Content-type": "multipart/form-data"
           },
           data: data,
           onUploadProgress: function onUploadProgress(res) {
-            _this2.onProgress(res);
+            _this2.onProgress({
+              loaded: res.loaded,
+              total: res.total,
+              percent: res.progress * 100
+            });
           }
         });
       }
     }, {
       key: "setQiniu",
       value: function setQiniu(config) {
-        console.log(config);
-        this.uploader = upload(this.file, config.prefix + "1", config.token);
+        this.uploader = {};
       }
     }, {
       key: "setLocal",
@@ -21395,7 +21402,11 @@
           },
           data: data,
           onUploadProgress: function onUploadProgress(res) {
-            _this3.onProgress(res);
+            _this3.onProgress({
+              loaded: res.loaded,
+              total: res.total,
+              percent: res.progress * 100
+            });
           }
         });
       }
@@ -21482,37 +21493,45 @@
             while (1) {
               switch (_context4.prev = _context4.next) {
                 case 0:
+                  console.log(file);
                   this.file = file;
                   if (!(this.config && this.config.expire_time && Math.round(new Date().getTime() / 1000 - 28800) > this.config.expire_time || !this.config)) {
-                    _context4.next = 4;
+                    _context4.next = 5;
                     break;
                   }
-                  _context4.next = 4;
+                  _context4.next = 5;
                   return this.getConfig(file);
-                case 4:
+                case 5:
                   if (!(this.uploader == undefined)) {
-                    _context4.next = 6;
+                    _context4.next = 7;
                     break;
                   }
                   return _context4.abrupt("return");
-                case 6:
-                  config = this.config; // if (!this.checkMimeType(file.type, config.mime_types)) {
-                  //     return this.onFail(new Error("File type is not allowed"));
-                  // }
-                  // if (file.size > config.max_size) {
-                  //     return this.onFail(new Error("The file is too large"));
-                  // }
-                  _context4.t0 = this.driver;
-                  _context4.next = _context4.t0 === "aliyun" ? 10 : _context4.t0 === "qiniu" ? 18 : _context4.t0 === "tencent" ? 20 : _context4.t0 === "local" ? 25 : 34;
-                  break;
+                case 7:
+                  config = this.config;
+                  if (this.checkMimeType(file.type, config.mime_types)) {
+                    _context4.next = 10;
+                    break;
+                  }
+                  return _context4.abrupt("return", this.onFail(new Error("文件类型不符")));
                 case 10:
+                  if (!(file.size > config.max_size)) {
+                    _context4.next = 12;
+                    break;
+                  }
+                  return _context4.abrupt("return", this.onFail(new Error("文件超出最大上传大小限制")));
+                case 12:
+                  _context4.t0 = this.driver;
+                  _context4.next = _context4.t0 === "aliyun" ? 15 : _context4.t0 === "qiniu" ? 23 : _context4.t0 === "tencent" ? 26 : _context4.t0 === "local" ? 31 : 40;
+                  break;
+                case 15:
                   data = this.uploader.defaults.data;
-                  _context4.next = 13;
-                  return this.getKey(this.file);
-                case 13:
+                  _context4.next = 18;
+                  return this.getKey(file);
+                case 18:
                   key = _context4.sent;
                   data.append("key", config.dir + key);
-                  data.append("file", this.file);
+                  data.append("file", file);
                   this.uploader.request({
                     url: config.host,
                     data: data
@@ -21524,12 +21543,39 @@
                         while (1) {
                           switch (_context2.prev = _context2.next) {
                             case 0:
-                              // await import('fast-xml-parser');
-                              // console.log(XMLParser);
-                              // parseString()
-                              console.log(err);
-                              _this4.onFail(err);
-                            case 2:
+                              if (!(err instanceof AxiosError)) {
+                                _context2.next = 10;
+                                break;
+                              }
+                              if (!err.response.data.includes("Invalid according to Policy: Policy expired.")) {
+                                _context2.next = 4;
+                                break;
+                              }
+                              _this4.config = null;
+                              return _context2.abrupt("return", _this4.send(file));
+                            case 4:
+                              if (!err.response.data.includes("<Code>FileAlreadyExists</Code>")) {
+                                _context2.next = 6;
+                                break;
+                              }
+                              return _context2.abrupt("return", _this4.onSuccess({
+                                url: config.host + config.dir + key
+                              }));
+                            case 6:
+                              if (!err.response.data.includes("Invalid according to Policy: Policy Condition failed: [\"in\", \"$content-type\"")) {
+                                _context2.next = 8;
+                                break;
+                              }
+                              return _context2.abrupt("return", _this4.onFail(new Error("文件类型不符")));
+                            case 8:
+                              if (!err.response.data.includes("<Code>EntityTooLarge</Code>")) {
+                                _context2.next = 10;
+                                break;
+                              }
+                              return _context2.abrupt("return", _this4.onFail(new Error("文件超出最大上传大小限制")));
+                            case 10:
+                              _this4.onFail(new Error("上传错误"));
+                            case 11:
                             case "end":
                               return _context2.stop();
                           }
@@ -21540,24 +21586,43 @@
                       return _ref3.apply(this, arguments);
                     };
                   }());
-                  return _context4.abrupt("break", 35);
-                case 18:
+                  return _context4.abrupt("break", 41);
+                case 23:
+                  this.uploader = upload(file, null, config.token);
                   this.uploader.subscribe({
-                    next: function next(res) {
-                      _this4.onProgress(res);
+                    next: function next(_ref4) {
+                      var total = _ref4.total;
+                      _this4.onProgress({
+                        loaded: total.loaded,
+                        total: total.size,
+                        percent: total.percent
+                      });
                     },
                     error: function error(err) {
-                      _this4.onFail(err);
+                      if (err instanceof QiniuRequestError) {
+                        if (err.code === 403) {
+                          if (err.data.err.includes("limited mimeType")) {
+                            return _this4.onFail(new Error("文件类型不符"));
+                          }
+                          if (err.data.err.includes("key doesn't match with scope")) {
+                            return _this4.onFail(new Error("上传错误"));
+                          }
+                        }
+                        if (err.code === 413) {
+                          return _this4.onFail(new Error("文件超出最大上传大小限制"));
+                        }
+                      }
+                      _this4.onFail(new Error("上传错误"));
                     },
                     complete: function complete(res) {
                       _this4.onSuccess(res);
                     }
                   });
-                  return _context4.abrupt("break", 35);
-                case 20:
-                  _context4.next = 22;
-                  return this.getKey(this.file);
-                case 22:
+                  return _context4.abrupt("break", 41);
+                case 26:
+                  _context4.next = 28;
+                  return this.getKey(file);
+                case 28:
                   key = _context4.sent;
                   this.uploader.putObject({
                     Bucket: config.bucket /* 存储桶: */,
@@ -21568,10 +21633,14 @@
                     Body: file,
                     // 上传文件对象
                     onProgress: function onProgress(progressData) {
-                      _this4.onProgress(progressData);
+                      _this4.onProgress({
+                        loaded: progressData.loaded,
+                        total: progressData.total,
+                        percent: progressData.percent * 100
+                      });
                     }
                   }, /*#__PURE__*/function () {
-                    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(err, data) {
+                    var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(err, data) {
                       var res;
                       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
                         while (1) {
@@ -21594,6 +21663,11 @@
                                 localtion: data.Location,
                                 mimetype: file.type,
                                 size: file.size
+                              })["catch"](function (err) {
+                                if (err instanceof AxiosError) {
+                                  var _err$response$data;
+                                  return _this4.onFail(new Error((_err$response$data = err.response.data) === null || _err$response$data === void 0 ? void 0 : _err$response$data.msg));
+                                }
                               });
                             case 5:
                               res = _context3.sent;
@@ -21601,13 +21675,13 @@
                             case 9:
                               _context3.prev = 9;
                               _context3.t0 = _context3["catch"](2);
-                              return _context3.abrupt("return", _this4.onFail(_context3.t0));
+                              _this4.onFail(err);
                             case 12:
-                              _this4.onFail(data);
+                              _this4.onFail(new Error("上传失败"));
                               _context3.next = 16;
                               break;
                             case 15:
-                              _this4.onFail(err);
+                              _this4.onFail(new Error("上传失败"));
                             case 16:
                             case "end":
                               return _context3.stop();
@@ -21616,16 +21690,16 @@
                       }, _callee3, null, [[2, 9]]);
                     }));
                     return function (_x4, _x5) {
-                      return _ref4.apply(this, arguments);
+                      return _ref5.apply(this, arguments);
                     };
                   }());
-                  return _context4.abrupt("break", 35);
-                case 25:
+                  return _context4.abrupt("break", 41);
+                case 31:
                   _context4.t1 = this.uploader.defaults.data;
                   _context4.t2 = config.prefix;
-                  _context4.next = 29;
+                  _context4.next = 35;
                   return this.getKey(file);
-                case 29:
+                case 35:
                   _context4.t3 = _context4.sent;
                   _context4.t4 = _context4.t2 + _context4.t3;
                   _context4.t1.append.call(_context4.t1, "key", _context4.t4);
@@ -21635,12 +21709,16 @@
                   }).then(function (res) {
                     _this4.onSuccess(res.data);
                   })["catch"](function (err) {
+                    if (err instanceof AxiosError) {
+                      var _err$response$data2;
+                      return _this4.onFail(new Error((_err$response$data2 = err.response.data) === null || _err$response$data2 === void 0 ? void 0 : _err$response$data2.msg));
+                    }
                     _this4.onFail(err);
                   });
-                  return _context4.abrupt("break", 35);
-                case 34:
-                  return _context4.abrupt("break", 35);
-                case 35:
+                  return _context4.abrupt("break", 41);
+                case 40:
+                  return _context4.abrupt("break", 41);
+                case 41:
                 case "end":
                   return _context4.stop();
               }

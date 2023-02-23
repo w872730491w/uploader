@@ -1,4 +1,4 @@
-// Uploader v1.0.0 Copyright (c) 2023 wwy and contributors
+// lanyunit-uploader v1.0.0 Copyright (c) 2023 wwy and contributors
 'use strict';
 
 var querystring = require('querystring');
@@ -733,7 +733,7 @@ var utils = {
  *
  * @returns {Error} The created error.
  */
-function AxiosError(message, code, config, request, response) {
+function AxiosError$1(message, code, config, request, response) {
   Error.call(this);
 
   if (Error.captureStackTrace) {
@@ -750,7 +750,7 @@ function AxiosError(message, code, config, request, response) {
   response && (this.response = response);
 }
 
-utils.inherits(AxiosError, Error, {
+utils.inherits(AxiosError$1, Error, {
   toJSON: function toJSON() {
     return {
       // Standard
@@ -772,7 +772,7 @@ utils.inherits(AxiosError, Error, {
   }
 });
 
-const prototype$1 = AxiosError.prototype;
+const prototype$1 = AxiosError$1.prototype;
 const descriptors = {};
 
 [
@@ -793,11 +793,11 @@ const descriptors = {};
   descriptors[code] = {value: code};
 });
 
-Object.defineProperties(AxiosError, descriptors);
+Object.defineProperties(AxiosError$1, descriptors);
 Object.defineProperty(prototype$1, 'isAxiosError', {value: true});
 
 // eslint-disable-next-line func-names
-AxiosError.from = (error, code, config, request, response, customProps) => {
+AxiosError$1.from = (error, code, config, request, response, customProps) => {
   const axiosError = Object.create(prototype$1);
 
   utils.toFlatObject(error, axiosError, function filter(obj) {
@@ -806,7 +806,7 @@ AxiosError.from = (error, code, config, request, response, customProps) => {
     return prop !== 'isAxiosError';
   });
 
-  AxiosError.call(axiosError, error.message, code, config, request, response);
+  AxiosError$1.call(axiosError, error.message, code, config, request, response);
 
   axiosError.cause = error;
 
@@ -898,7 +898,7 @@ const predicates = utils.toFlatObject(utils, {}, null, function filter(prop) {
  *
  * @returns
  */
-function toFormData(obj, formData, options) {
+function toFormData$1(obj, formData, options) {
   if (!utils.isObject(obj)) {
     throw new TypeError('target must be an object');
   }
@@ -936,7 +936,7 @@ function toFormData(obj, formData, options) {
     }
 
     if (!useBlob && utils.isBlob(value)) {
-      throw new AxiosError('Blob is not supported. Use a Buffer instead.');
+      throw new AxiosError$1('Blob is not supported. Use a Buffer instead.');
     }
 
     if (utils.isArrayBuffer(value) || utils.isTypedArray(value)) {
@@ -1065,7 +1065,7 @@ function encode$1(str) {
 function AxiosURLSearchParams(params, options) {
   this._pairs = [];
 
-  params && toFormData(params, this, options);
+  params && toFormData$1(params, this, options);
 }
 
 const prototype = AxiosURLSearchParams.prototype;
@@ -1283,7 +1283,7 @@ var platform = {
 };
 
 function toURLEncodedForm(data, options) {
-  return toFormData(data, new platform.classes.URLSearchParams(), Object.assign({
+  return toFormData$1(data, new platform.classes.URLSearchParams(), Object.assign({
     visitor: function(value, key, path, helpers) {
       if (platform.isNode && utils.isBuffer(value)) {
         this.append(key, value.toString('base64'));
@@ -1461,7 +1461,7 @@ const defaults = {
       if ((isFileList = utils.isFileList(data)) || contentType.indexOf('multipart/form-data') > -1) {
         const _FormData = this.env && this.env.FormData;
 
-        return toFormData(
+        return toFormData$1(
           isFileList ? {'files[]': data} : data,
           _FormData && new _FormData(),
           this.formSerializer
@@ -1491,7 +1491,7 @@ const defaults = {
       } catch (e) {
         if (strictJSONParsing) {
           if (e.name === 'SyntaxError') {
-            throw AxiosError.from(e, AxiosError.ERR_BAD_RESPONSE, this, null, this.response);
+            throw AxiosError$1.from(e, AxiosError$1.ERR_BAD_RESPONSE, this, null, this.response);
           }
           throw e;
         }
@@ -1661,7 +1661,7 @@ function buildAccessors(obj, header) {
   });
 }
 
-class AxiosHeaders {
+class AxiosHeaders$1 {
   constructor(headers) {
     headers && this.set(headers);
   }
@@ -1870,12 +1870,12 @@ class AxiosHeaders {
   }
 }
 
-AxiosHeaders.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent', 'Authorization']);
+AxiosHeaders$1.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent', 'Authorization']);
 
-utils.freezeMethods(AxiosHeaders.prototype);
-utils.freezeMethods(AxiosHeaders);
+utils.freezeMethods(AxiosHeaders$1.prototype);
+utils.freezeMethods(AxiosHeaders$1);
 
-var AxiosHeaders$1 = AxiosHeaders;
+var AxiosHeaders$2 = AxiosHeaders$1;
 
 /**
  * Transform the data for a request or a response
@@ -1888,7 +1888,7 @@ var AxiosHeaders$1 = AxiosHeaders;
 function transformData(fns, response) {
   const config = this || defaults$1;
   const context = response || config;
-  const headers = AxiosHeaders$1.from(context.headers);
+  const headers = AxiosHeaders$2.from(context.headers);
   let data = context.data;
 
   utils.forEach(fns, function transform(fn) {
@@ -1900,7 +1900,7 @@ function transformData(fns, response) {
   return data;
 }
 
-function isCancel(value) {
+function isCancel$1(value) {
   return !!(value && value.__CANCEL__);
 }
 
@@ -1913,13 +1913,13 @@ function isCancel(value) {
  *
  * @returns {CanceledError} The created error.
  */
-function CanceledError(message, config, request) {
+function CanceledError$1(message, config, request) {
   // eslint-disable-next-line no-eq-null,eqeqeq
-  AxiosError.call(this, message == null ? 'canceled' : message, AxiosError.ERR_CANCELED, config, request);
+  AxiosError$1.call(this, message == null ? 'canceled' : message, AxiosError$1.ERR_CANCELED, config, request);
   this.name = 'CanceledError';
 }
 
-utils.inherits(CanceledError, AxiosError, {
+utils.inherits(CanceledError$1, AxiosError$1, {
   __CANCEL__: true
 });
 
@@ -1937,9 +1937,9 @@ function settle(resolve, reject, response) {
   if (!response.status || !validateStatus || validateStatus(response.status)) {
     resolve(response);
   } else {
-    reject(new AxiosError(
+    reject(new AxiosError$1(
       'Request failed with status code ' + response.status,
-      [AxiosError.ERR_BAD_REQUEST, AxiosError.ERR_BAD_RESPONSE][Math.floor(response.status / 100) - 4],
+      [AxiosError$1.ERR_BAD_REQUEST, AxiosError$1.ERR_BAD_RESPONSE][Math.floor(response.status / 100) - 4],
       response.config,
       response.request,
       response
@@ -2194,7 +2194,7 @@ const isXHRAdapterSupported = typeof XMLHttpRequest !== 'undefined';
 var xhrAdapter = isXHRAdapterSupported && function (config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
     let requestData = config.data;
-    const requestHeaders = AxiosHeaders$1.from(config.headers).normalize();
+    const requestHeaders = AxiosHeaders$2.from(config.headers).normalize();
     const responseType = config.responseType;
     let onCanceled;
     function done() {
@@ -2232,7 +2232,7 @@ var xhrAdapter = isXHRAdapterSupported && function (config) {
         return;
       }
       // Prepare the response
-      const responseHeaders = AxiosHeaders$1.from(
+      const responseHeaders = AxiosHeaders$2.from(
         'getAllResponseHeaders' in request && request.getAllResponseHeaders()
       );
       const responseData = !responseType || responseType === 'text' || responseType === 'json' ?
@@ -2287,7 +2287,7 @@ var xhrAdapter = isXHRAdapterSupported && function (config) {
         return;
       }
 
-      reject(new AxiosError('Request aborted', AxiosError.ECONNABORTED, config, request));
+      reject(new AxiosError$1('Request aborted', AxiosError$1.ECONNABORTED, config, request));
 
       // Clean up request
       request = null;
@@ -2297,7 +2297,7 @@ var xhrAdapter = isXHRAdapterSupported && function (config) {
     request.onerror = function handleError() {
       // Real errors are hidden from us by the browser
       // onerror should only fire if it's a network error
-      reject(new AxiosError('Network Error', AxiosError.ERR_NETWORK, config, request));
+      reject(new AxiosError$1('Network Error', AxiosError$1.ERR_NETWORK, config, request));
 
       // Clean up request
       request = null;
@@ -2310,9 +2310,9 @@ var xhrAdapter = isXHRAdapterSupported && function (config) {
       if (config.timeoutErrorMessage) {
         timeoutErrorMessage = config.timeoutErrorMessage;
       }
-      reject(new AxiosError(
+      reject(new AxiosError$1(
         timeoutErrorMessage,
-        transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED,
+        transitional.clarifyTimeoutError ? AxiosError$1.ETIMEDOUT : AxiosError$1.ECONNABORTED,
         config,
         request));
 
@@ -2370,7 +2370,7 @@ var xhrAdapter = isXHRAdapterSupported && function (config) {
         if (!request) {
           return;
         }
-        reject(!cancel || cancel.type ? new CanceledError(null, config, request) : cancel);
+        reject(!cancel || cancel.type ? new CanceledError$1(null, config, request) : cancel);
         request.abort();
         request = null;
       };
@@ -2384,7 +2384,7 @@ var xhrAdapter = isXHRAdapterSupported && function (config) {
     const protocol = parseProtocol(fullPath);
 
     if (protocol && platform.protocols.indexOf(protocol) === -1) {
-      reject(new AxiosError('Unsupported protocol ' + protocol + ':', AxiosError.ERR_BAD_REQUEST, config));
+      reject(new AxiosError$1('Unsupported protocol ' + protocol + ':', AxiosError$1.ERR_BAD_REQUEST, config));
       return;
     }
 
@@ -2427,7 +2427,7 @@ var adapters = {
 
     if (!adapter) {
       if (adapter === false) {
-        throw new AxiosError(
+        throw new AxiosError$1(
           `Adapter ${nameOrAdapter} is not supported by the environment`,
           'ERR_NOT_SUPPORT'
         );
@@ -2462,7 +2462,7 @@ function throwIfCancellationRequested(config) {
   }
 
   if (config.signal && config.signal.aborted) {
-    throw new CanceledError(null, config);
+    throw new CanceledError$1(null, config);
   }
 }
 
@@ -2476,7 +2476,7 @@ function throwIfCancellationRequested(config) {
 function dispatchRequest(config) {
   throwIfCancellationRequested(config);
 
-  config.headers = AxiosHeaders$1.from(config.headers);
+  config.headers = AxiosHeaders$2.from(config.headers);
 
   // Transform request data
   config.data = transformData.call(
@@ -2500,11 +2500,11 @@ function dispatchRequest(config) {
       response
     );
 
-    response.headers = AxiosHeaders$1.from(response.headers);
+    response.headers = AxiosHeaders$2.from(response.headers);
 
     return response;
   }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
+    if (!isCancel$1(reason)) {
       throwIfCancellationRequested(config);
 
       // Transform response data
@@ -2514,7 +2514,7 @@ function dispatchRequest(config) {
           config.transformResponse,
           reason.response
         );
-        reason.response.headers = AxiosHeaders$1.from(reason.response.headers);
+        reason.response.headers = AxiosHeaders$2.from(reason.response.headers);
       }
     }
 
@@ -2522,7 +2522,7 @@ function dispatchRequest(config) {
   });
 }
 
-const headersToObject = (thing) => thing instanceof AxiosHeaders$1 ? thing.toJSON() : thing;
+const headersToObject = (thing) => thing instanceof AxiosHeaders$2 ? thing.toJSON() : thing;
 
 /**
  * Config-specific merge-function which creates a new config-object
@@ -2533,7 +2533,7 @@ const headersToObject = (thing) => thing instanceof AxiosHeaders$1 ? thing.toJSO
  *
  * @returns {Object} New object resulting from merging config2 to config1
  */
-function mergeConfig(config1, config2) {
+function mergeConfig$1(config1, config2) {
   // eslint-disable-next-line no-param-reassign
   config2 = config2 || {};
   const config = {};
@@ -2623,7 +2623,7 @@ function mergeConfig(config1, config2) {
   return config;
 }
 
-const VERSION = "1.3.3";
+const VERSION$1 = "1.3.3";
 
 const validators$1 = {};
 
@@ -2647,15 +2647,15 @@ const deprecatedWarnings = {};
  */
 validators$1.transitional = function transitional(validator, version, message) {
   function formatMessage(opt, desc) {
-    return '[Axios v' + VERSION + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
+    return '[Axios v' + VERSION$1 + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
   }
 
   // eslint-disable-next-line func-names
   return (value, opt, opts) => {
     if (validator === false) {
-      throw new AxiosError(
+      throw new AxiosError$1(
         formatMessage(opt, ' has been removed' + (version ? ' in ' + version : '')),
-        AxiosError.ERR_DEPRECATED
+        AxiosError$1.ERR_DEPRECATED
       );
     }
 
@@ -2686,7 +2686,7 @@ validators$1.transitional = function transitional(validator, version, message) {
 
 function assertOptions(options, schema, allowUnknown) {
   if (typeof options !== 'object') {
-    throw new AxiosError('options must be an object', AxiosError.ERR_BAD_OPTION_VALUE);
+    throw new AxiosError$1('options must be an object', AxiosError$1.ERR_BAD_OPTION_VALUE);
   }
   const keys = Object.keys(options);
   let i = keys.length;
@@ -2697,12 +2697,12 @@ function assertOptions(options, schema, allowUnknown) {
       const value = options[opt];
       const result = value === undefined || validator(value, opt, options);
       if (result !== true) {
-        throw new AxiosError('option ' + opt + ' must be ' + result, AxiosError.ERR_BAD_OPTION_VALUE);
+        throw new AxiosError$1('option ' + opt + ' must be ' + result, AxiosError$1.ERR_BAD_OPTION_VALUE);
       }
       continue;
     }
     if (allowUnknown !== true) {
-      throw new AxiosError('Unknown option ' + opt, AxiosError.ERR_BAD_OPTION);
+      throw new AxiosError$1('Unknown option ' + opt, AxiosError$1.ERR_BAD_OPTION);
     }
   }
 }
@@ -2721,7 +2721,7 @@ const validators = validator.validators;
  *
  * @return {Axios} A new instance of Axios
  */
-class Axios {
+class Axios$1 {
   constructor(instanceConfig) {
     this.defaults = instanceConfig;
     this.interceptors = {
@@ -2748,7 +2748,7 @@ class Axios {
       config = configOrUrl || {};
     }
 
-    config = mergeConfig(this.defaults, config);
+    config = mergeConfig$1(this.defaults, config);
 
     const {transitional, paramsSerializer, headers} = config;
 
@@ -2785,7 +2785,7 @@ class Axios {
       }
     );
 
-    config.headers = AxiosHeaders$1.concat(contextHeaders, headers);
+    config.headers = AxiosHeaders$2.concat(contextHeaders, headers);
 
     // filter out skipped interceptors
     const requestInterceptorChain = [];
@@ -2858,7 +2858,7 @@ class Axios {
   }
 
   getUri(config) {
-    config = mergeConfig(this.defaults, config);
+    config = mergeConfig$1(this.defaults, config);
     const fullPath = buildFullPath(config.baseURL, config.url);
     return buildURL(fullPath, config.params, config.paramsSerializer);
   }
@@ -2867,8 +2867,8 @@ class Axios {
 // Provide aliases for supported request methods
 utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
   /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(mergeConfig(config || {}, {
+  Axios$1.prototype[method] = function(url, config) {
+    return this.request(mergeConfig$1(config || {}, {
       method,
       url,
       data: (config || {}).data
@@ -2881,7 +2881,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
   function generateHTTPMethod(isForm) {
     return function httpMethod(url, data, config) {
-      return this.request(mergeConfig(config || {}, {
+      return this.request(mergeConfig$1(config || {}, {
         method,
         headers: isForm ? {
           'Content-Type': 'multipart/form-data'
@@ -2892,12 +2892,12 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
     };
   }
 
-  Axios.prototype[method] = generateHTTPMethod();
+  Axios$1.prototype[method] = generateHTTPMethod();
 
-  Axios.prototype[method + 'Form'] = generateHTTPMethod(true);
+  Axios$1.prototype[method + 'Form'] = generateHTTPMethod(true);
 });
 
-var Axios$1 = Axios;
+var Axios$2 = Axios$1;
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -2906,7 +2906,7 @@ var Axios$1 = Axios;
  *
  * @returns {CancelToken}
  */
-class CancelToken {
+class CancelToken$1 {
   constructor(executor) {
     if (typeof executor !== 'function') {
       throw new TypeError('executor must be a function.');
@@ -2954,7 +2954,7 @@ class CancelToken {
         return;
       }
 
-      token.reason = new CanceledError(message, config, request);
+      token.reason = new CanceledError$1(message, config, request);
       resolvePromise(token.reason);
     });
   }
@@ -3005,7 +3005,7 @@ class CancelToken {
    */
   static source() {
     let cancel;
-    const token = new CancelToken(function executor(c) {
+    const token = new CancelToken$1(function executor(c) {
       cancel = c;
     });
     return {
@@ -3015,7 +3015,7 @@ class CancelToken {
   }
 }
 
-var CancelToken$1 = CancelToken;
+var CancelToken$2 = CancelToken$1;
 
 /**
  * Syntactic sugar for invoking a function and expanding an array for arguments.
@@ -3038,7 +3038,7 @@ var CancelToken$1 = CancelToken;
  *
  * @returns {Function}
  */
-function spread(callback) {
+function spread$1(callback) {
   return function wrap(arr) {
     return callback.apply(null, arr);
   };
@@ -3051,11 +3051,11 @@ function spread(callback) {
  *
  * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
  */
-function isAxiosError(payload) {
+function isAxiosError$1(payload) {
   return utils.isObject(payload) && (payload.isAxiosError === true);
 }
 
-const HttpStatusCode = {
+const HttpStatusCode$1 = {
   Continue: 100,
   SwitchingProtocols: 101,
   Processing: 102,
@@ -3121,11 +3121,11 @@ const HttpStatusCode = {
   NetworkAuthenticationRequired: 511,
 };
 
-Object.entries(HttpStatusCode).forEach(([key, value]) => {
-  HttpStatusCode[value] = key;
+Object.entries(HttpStatusCode$1).forEach(([key, value]) => {
+  HttpStatusCode$1[value] = key;
 });
 
-var HttpStatusCode$1 = HttpStatusCode;
+var HttpStatusCode$2 = HttpStatusCode$1;
 
 /**
  * Create an instance of Axios
@@ -3135,18 +3135,18 @@ var HttpStatusCode$1 = HttpStatusCode;
  * @returns {Axios} A new instance of Axios
  */
 function createInstance(defaultConfig) {
-  const context = new Axios$1(defaultConfig);
-  const instance = bind(Axios$1.prototype.request, context);
+  const context = new Axios$2(defaultConfig);
+  const instance = bind(Axios$2.prototype.request, context);
 
   // Copy axios.prototype to instance
-  utils.extend(instance, Axios$1.prototype, context, {allOwnKeys: true});
+  utils.extend(instance, Axios$2.prototype, context, {allOwnKeys: true});
 
   // Copy context to instance
   utils.extend(instance, context, null, {allOwnKeys: true});
 
   // Factory for creating new instances
   instance.create = function create(instanceConfig) {
-    return createInstance(mergeConfig(defaultConfig, instanceConfig));
+    return createInstance(mergeConfig$1(defaultConfig, instanceConfig));
   };
 
   return instance;
@@ -3156,17 +3156,17 @@ function createInstance(defaultConfig) {
 const axios = createInstance(defaults$1);
 
 // Expose Axios class to allow class inheritance
-axios.Axios = Axios$1;
+axios.Axios = Axios$2;
 
 // Expose Cancel & CancelToken
-axios.CanceledError = CanceledError;
-axios.CancelToken = CancelToken$1;
-axios.isCancel = isCancel;
-axios.VERSION = VERSION;
-axios.toFormData = toFormData;
+axios.CanceledError = CanceledError$1;
+axios.CancelToken = CancelToken$2;
+axios.isCancel = isCancel$1;
+axios.VERSION = VERSION$1;
+axios.toFormData = toFormData$1;
 
 // Expose AxiosError class
-axios.AxiosError = AxiosError;
+axios.AxiosError = AxiosError$1;
 
 // alias for CanceledError for backward compatibility
 axios.Cancel = axios.CanceledError;
@@ -3176,24 +3176,45 @@ axios.all = function all(promises) {
   return Promise.all(promises);
 };
 
-axios.spread = spread;
+axios.spread = spread$1;
 
 // Expose isAxiosError
-axios.isAxiosError = isAxiosError;
+axios.isAxiosError = isAxiosError$1;
 
 // Expose mergeConfig
-axios.mergeConfig = mergeConfig;
+axios.mergeConfig = mergeConfig$1;
 
-axios.AxiosHeaders = AxiosHeaders$1;
+axios.AxiosHeaders = AxiosHeaders$2;
 
 axios.formToJSON = thing => formDataToJSON(utils.isHTMLForm(thing) ? new FormData(thing) : thing);
 
-axios.HttpStatusCode = HttpStatusCode$1;
+axios.HttpStatusCode = HttpStatusCode$2;
 
 axios.default = axios;
 
 // this module should only have a default export
 var axios$1 = axios;
+
+// This module is intended to unwrap Axios default export as named.
+// Keep top-level export same with static properties
+// so that it can keep same with es module or cjs
+const {
+  Axios,
+  AxiosError,
+  CanceledError,
+  isCancel,
+  CancelToken,
+  VERSION,
+  all,
+  Cancel,
+  isAxiosError,
+  spread,
+  toFormData,
+  AxiosHeaders,
+  HttpStatusCode,
+  formToJSON,
+  mergeConfig
+} = axios$1;
 
 var __extends$3 = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -20656,7 +20677,7 @@ var lib = createCommonjsModule(function (module, exports) {
 });
 
 class uploader {
-    constructor({ type, onSuccess, onFail, onGetConfig, onProgress }) {
+    constructor({ type, onSuccess = () => {}, onFail = () => {}, onGetConfig, onProgress = () => {} }) {
         this.type = type;
         this.onSuccess = onSuccess;
         this.onFail = onFail;
@@ -20737,18 +20758,22 @@ class uploader {
         this.uploader = axios$1.create({
             method: "POST",
             headers: {
+                Accept: "application/json",
                 "Content-type": "multipart/form-data",
             },
             data,
             onUploadProgress: (res) => {
-                this.onProgress(res);
+                this.onProgress({
+                    loaded: res.loaded,
+                    total: res.total,
+                    percent: res.progress * 100,
+                });
             },
         });
     }
 
     setQiniu(config) {
-        console.log(config);
-        this.uploader = upload(this.file, config.prefix + "1", config.token);
+        this.uploader = {};
     }
 
     setLocal(config) {
@@ -20764,7 +20789,11 @@ class uploader {
             },
             data,
             onUploadProgress: (res) => {
-                this.onProgress(res);
+                this.onProgress({
+                    loaded: res.loaded,
+                    total: res.total,
+                    percent: res.progress * 100,
+                });
             },
         });
     }
@@ -20813,6 +20842,7 @@ class uploader {
     }
 
     async send(file) {
+        console.log(file);
         this.file = file;
 
         if ((this.config && this.config.expire_time && Math.round(new Date().getTime() / 1000 - 28800) > this.config.expire_time) || !this.config) {
@@ -20825,20 +20855,20 @@ class uploader {
 
         const config = this.config;
 
-        // if (!this.checkMimeType(file.type, config.mime_types)) {
-        //     return this.onFail(new Error("File type is not allowed"));
-        // }
+        if (!this.checkMimeType(file.type, config.mime_types)) {
+            return this.onFail(new Error("文件类型不符"));
+        }
 
-        // if (file.size > config.max_size) {
-        //     return this.onFail(new Error("The file is too large"));
-        // }
+        if (file.size > config.max_size) {
+            return this.onFail(new Error("文件超出最大上传大小限制"));
+        }
 
         switch (this.driver) {
             case "aliyun":
                 var data = this.uploader.defaults.data;
-                var key = await this.getKey(this.file);
+                var key = await this.getKey(file);
                 data.append("key", config.dir + key);
-                data.append("file", this.file);
+                data.append("file", file);
                 this.uploader
                     .request({
                         url: config.host,
@@ -20848,20 +20878,51 @@ class uploader {
                         this.onSuccess(res.data);
                     })
                     .catch(async (err) => {
-                        // await import('fast-xml-parser');
-                        // console.log(XMLParser);
-                        // parseString()
-                        console.log(err);
-                        this.onFail(err);
+                        if (err instanceof AxiosError) {
+                            if (err.response.data.includes("Invalid according to Policy: Policy expired.")) {
+                                this.config = null;
+                                return this.send(file);
+                            }
+                            if (err.response.data.includes("<Code>FileAlreadyExists</Code>")) {
+                                return this.onSuccess({
+                                    url: config.host + config.dir + key,
+                                });
+                            }
+                            if (err.response.data.includes(`Invalid according to Policy: Policy Condition failed: ["in", "$content-type"`)) {
+                                return this.onFail(new Error("文件类型不符"));
+                            }
+                            if (err.response.data.includes(`<Code>EntityTooLarge</Code>`)) {
+                                return this.onFail(new Error("文件超出最大上传大小限制"));
+                            }
+                        }
+                        this.onFail(new Error("上传错误"));
                     });
                 break;
             case "qiniu":
+                this.uploader = upload(file, null, config.token);
                 this.uploader.subscribe({
-                    next: (res) => {
-                        this.onProgress(res);
+                    next: ({ total }) => {
+                        this.onProgress({
+                            loaded: total.loaded,
+                            total: total.size,
+                            percent: total.percent,
+                        });
                     },
                     error: (err) => {
-                        this.onFail(err);
+                        if (err instanceof QiniuRequestError) {
+                            if (err.code === 403) {
+                                if (err.data.err.includes("limited mimeType")) {
+                                    return this.onFail(new Error("文件类型不符"));
+                                }
+                                if (err.data.err.includes("key doesn't match with scope")) {
+                                    return this.onFail(new Error("上传错误"));
+                                }
+                            }
+                            if (err.code === 413) {
+                                return this.onFail(new Error("文件超出最大上传大小限制"));
+                            }
+                        }
+                        this.onFail(new Error("上传错误"));
                     },
                     complete: (res) => {
                         this.onSuccess(res);
@@ -20869,7 +20930,7 @@ class uploader {
                 });
                 break;
             case "tencent":
-                var key = await this.getKey(this.file);
+                var key = await this.getKey(file);
                 this.uploader.putObject(
                     {
                         Bucket: config.bucket /* 存储桶: */,
@@ -20878,29 +20939,39 @@ class uploader {
                         StorageClass: "STANDARD", // 固定值
                         Body: file, // 上传文件对象
                         onProgress: (progressData) => {
-                            this.onProgress(progressData);
+                            this.onProgress({
+                                loaded: progressData.loaded,
+                                total: progressData.total,
+                                percent: progressData.percent * 100,
+                            });
                         },
                     },
                     async (err, data) => {
                         if (data) {
                             if (data.statusCode === 200) {
                                 try {
-                                    const res = await axios$1.post(config.callback_url, {
-                                        etag: data.ETag,
-                                        sessionToken: config.tempKeys.credentials.sessionToken,
-                                        auth: config.auth,
-                                        localtion: data.Location,
-                                        mimetype: file.type,
-                                        size: file.size,
-                                    });
+                                    const res = await axios$1
+                                        .post(config.callback_url, {
+                                            etag: data.ETag,
+                                            sessionToken: config.tempKeys.credentials.sessionToken,
+                                            auth: config.auth,
+                                            localtion: data.Location,
+                                            mimetype: file.type,
+                                            size: file.size,
+                                        })
+                                        .catch((err) => {
+                                            if (err instanceof AxiosError) {
+                                                return this.onFail(new Error(err.response.data?.msg));
+                                            }
+                                        });
                                     return this.onSuccess(res.data);
                                 } catch (error) {
-                                    return this.onFail(error);
+                                    this.onFail(err);
                                 }
                             }
-                            this.onFail(data);
+                            this.onFail(new Error("上传失败"));
                         } else {
-                            this.onFail(err);
+                            this.onFail(new Error("上传失败"));
                         }
                     }
                 );
@@ -20916,6 +20987,9 @@ class uploader {
                         this.onSuccess(res.data);
                     })
                     .catch((err) => {
+                        if (err instanceof AxiosError) {
+                            return this.onFail(new Error(err.response.data?.msg));
+                        }
                         this.onFail(err);
                     });
                 break;

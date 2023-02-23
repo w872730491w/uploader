@@ -56,7 +56,7 @@ const buildConfig = ({ es5, browser = true, minifiedVersion = true, ...config })
 
 export default async () => {
     const year = new Date().getFullYear();
-    const banner = `// Uploader v${lib.version} Copyright (c) ${year} ${lib.author} and contributors`;
+    const banner = `// lanyunit-uploader v${lib.version} Copyright (c) ${year} ${lib.author} and contributors`;
 
     return [
         // browser ESM bundle for CDN
